@@ -20,8 +20,8 @@ gh_org=your-org-name-here # Your GitHub Organization (or your username, if that'
 # PR information - please customize this information
 pr_body="This PR makes some automated changes to the repo."
 pr_title="🤖 Making some changes 🤖"
-branch_name='Branch-Name-Here'
-commit_message='Commit message here'
+branch_name="Branch-Name-Here"
+commit_message="Commit message here"
 
 # Should we use admin privileges to merge PR. 
 # If true, admin privileges will be used to merge the PR. You must have admin privileges to use this option. 
@@ -39,7 +39,7 @@ while IFS=$'\n' read -r gh_repo; do
   git clone git@github.com:$gh_org/${gh_repo}.git
 
   # Change directories into the repo
-  cd $gh_repo
+  cd "$gh_repo"
 
   ###
   ### Make your changes here
@@ -63,9 +63,9 @@ while IFS=$'\n' read -r gh_repo; do
   if [[ $(echo "$git_add" | grep -E 'add|remove') ]]; then
     
     # Changes were made, checkout a branch and make a PR
-    git checkout -b $branch_name
-    git commit -m $commit_message
-    ggpush
+    git checkout -b "$branch_name"
+    git commit -m "$commit_message"
+    git push origin "$branch_name"
     created_pr_url=$(gh pr create -b "$pr_body" -t "$pr_title" -B "$base_branch" --fill)
 
     # If auto_merge_pr is true, merge the PR
@@ -83,9 +83,13 @@ while IFS=$'\n' read -r gh_repo; do
   # Reset location
   cd ..
 
+  # Cleanup repo
+  rm -rf "$gh_repo"
+
 done <<< "$org_repos"
 
 # Finish
+echo ""
 echo "################"
 echo "Done!"
 echo "################"
