@@ -1,0 +1,33 @@
+name: PR Validate Jenkins _Any
+
+# Run this job on pull request with any action, which includes opening and any commit
+on: [pull_request]
+
+jobs:
+  jenkins_pr_validate_any:
+    runs-on: [self-hosted, Ue1TiEcrRunners] # Internal runners are required to reach Jenkins
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Identify PR commit
+        run: |
+          # Interestingly, GITHUB Actions are served a git log with an extra commit
+          # Genuinely no idea why, so we grab the appropriate commit from the log
+          commit_sha=$(git log | grep commit | sed -n 2p | cut -d " " -f 2)
+          
+          # Write commit sha to GITHUB_ENV so downstream tasks can use it
+          echo "commit_sha=$commit_sha" | tee -a $GITHUB_ENV
+      
+      - name: Jenkins Any PR Validate
+        id: jenkins_any_pr_validate
+        uses: practicefusion/ActionPRValidate_AnyJobRun@v1
+        with:
+          jenkins-username: "${{ secrets.JENKINS_USERNAME }}" # Jenkins username to run job, in PF org-wide secret
+          jenkins-api-token: "${{ secrets.JENKINS_API_TOKEN }}" # Jenkins API token for accessing Jenkins
+          jenkins-git-plugin-pat: "${{ secrets.JENKINS_GIT_PLUGIN_PAT }}"
+          github_repository: $GITHUB_REPOSITORY
+          commit_sha: ${{ env.commit_sha }}
+          branch: $GITHUB_HEAD_REF

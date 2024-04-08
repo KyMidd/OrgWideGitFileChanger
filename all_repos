@@ -4,7 +4,6 @@ EhrOAuthDomain
 TerraformActions
 ChartingApi
 EhiExportEndpoint
-CarbonUI
 FinancialDatabase
 ClinicalDocumentApi
 DiagnosesDomain
@@ -28,8 +27,6 @@ TfAwsEksSre
 TfAwsModuleKubernetes
 TfAwsModuleObservability
 TfAzPatientLedgerExtractNet
-
-
 BillingEndpoint
 pf-iis-3
 DOCommon
@@ -377,7 +374,6 @@ ConTaskDomain
 RcmsAlphaClientsProcessor
 PF.Testing.Contrib.RxAdherence
 release-scripts
-mmecalculator
 ui-interview-bugs
 ScriptProcessor
 SubscriptionDataSynchronizeSubscriber
@@ -478,7 +474,6 @@ AuditApi
 ConPhrUserSubscriber
 ConPhrUserDomain
 phr_openfire
-AmqMonitor
 ConMessageEndpoint
 ConPracticeDomain
 Francois
@@ -495,7 +490,6 @@ Test-Cycle-Management-API
 Regression-Activity-Generator
 TfAwsCloudFormationBootstrap
 BuildContainers
-jekyll-paginate-v2
 KubernetesDeploymentResourceGenerator
 pf-chef-api
 ec2_deregistration_lambdas
@@ -1366,7 +1360,6 @@ pf-hostsfile-2
 pf-extrahop-2
 test-actions
 Sns2Splunk
-PSSlack
 TfAwsInfraPipelines
 TfAwsModuleEksPrometheus
 PF.PublicApiSchemas.Billing
@@ -1427,8 +1420,6 @@ DockerUIGithubRunnerTF
 ConMessageAttachmentOrchestration
 TfAwsModuleEksFargate
 DockerPatientPortalGithubRunnerTF
-javascript
-styleguides
 TfAwsModuleVpc
 TfAwsModuleVpnGateway
 TfAwsModuleS3
@@ -1440,5 +1431,4 @@ TfAwsModuleKms
 ActionTriggerJenkinsJob
 sanitize-html-broken-talk-to-sguth
 ember-signature-pad
-sanitize-html
 devops-repo-template

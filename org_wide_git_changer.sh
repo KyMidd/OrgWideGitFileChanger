@@ -18,9 +18,9 @@ fi
 gh_org=practicefusion # Your GitHub Organization (or your username, if that's where your repos are)
 
 # PR information - please customize this information
-pr_body="🤖 DO-6769 Update commitNotify for new jenkins 🤖"
-pr_title="🤖 DO-6769 Update commitNotify for new jenkins 🤖"
-branch_name="feature/DO-6769-Update-commit-notifies-for-new-jenkins"
+pr_body="🤖 DO-6769 Update commitNotify and Jenkins_Any for new jenkins 🤖"
+pr_title="🤖 DO-6769 Update commitNotify and Jenkins_Any for new jenkins 🤖"
+branch_name="feature/DO-6769-Update-actions-for-jenkins-change"
 commit_message="DO-6769 Update for new jenkins"
 
 # Should we use admin privileges to merge PR. 
@@ -31,10 +31,45 @@ auto_merge_pr=true
 # Get the names of all repos in the org
 # This method is limited to 1k repos, if you have more than 1k repos, use this method: https://medium.com/@kymidd/lets-do-devops-github-api-paginated-calls-more-than-1k-repos-3ff0cc92cc50
 #org_repos=$(gh repo list --no-archived $gh_org -L 1000 --json name --jq '.[].name')
-org_repos=$(cat test_repos1)
+org_repos=$(cat all_repos)
+
+# Hold until rate-limit success
+hold_until_rate_limit_success() {
+  
+  # Loop forever
+  while true; do
+    
+    # Any call to AWS returns rate limits in the response headers
+    API_RATE_LIMIT_UNITS_REMAINING=$(curl -sv \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer $GITHUB_TOKEN" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      https://api.github.com/repos/$gh_org/ActionPRValidate_AnyJobRun/autolinks 2>&1 1>/dev/null \
+      | grep -E '< x-ratelimit-remaining' \
+      | cut -d ' ' -f 3 \
+      | xargs \
+      | tr -d '\r')
+
+    # If API rate-limiting is hit, sleep for 1 minute
+    # Rounded parenthesis are used to trigger arithmetic expansion, which compares more than the first numeric digit (bash is weird)
+    if (( "$API_RATE_LIMIT_UNITS_REMAINING" < 100 )); then
+      echo "ℹ️  We have less than 100 GitHub API rate-limit tokens left ($API_RATE_LIMIT_UNITS_REMAINING), sleeping for 1 minute"
+      sleep 60
+    
+    # If API rate-limiting shows remaining units, break out of loop and function
+    else  
+      echo "💥  Rate limit checked, we have "$API_RATE_LIMIT_UNITS_REMAINING" core tokens remaining so we are continuing"
+      break
+    fi
+
+  done
+}
 
 # Iterate over all repos, make changes
 while IFS=$'\n' read -r gh_repo; do
+  
+  # Check rate limit blockers, hold if token bucket too low
+  hold_until_rate_limit_success
   
   # Clone the repo, will fail if the repo folder already exists
   git clone git@github.com:$gh_org/${gh_repo}.git
@@ -48,6 +83,7 @@ while IFS=$'\n' read -r gh_repo; do
   ### For example, modify any file, or copy over existing files
   ###
   cp /Users/kyler/git/GitHub/KyMidd/OrgWideGitFileChanger/src/MergeCommitNotify.yml .github/workflows/MergeCommitNotify.yml
+  cp /Users/kyler/git/GitHub/KyMidd/OrgWideGitFileChanger/src/ActionPRValidate_AnyJobRun.yaml .github/workflows/ActionPRValidate_AnyJobRun.yaml
 
   # Read the REST info on the repo to get the repo's default branch
   # Set that default branch as the base branch for the PR
