@@ -149,7 +149,6 @@ AutomaticPFCommonUpdater
 JenkinsTools
 workflow_test
 pf-rundeck-enterprise-jobs
-test-dbdeploy
 MedicationDatabase
 PracticePracticeManagementSubscriber
 PF.Common.MSBuild

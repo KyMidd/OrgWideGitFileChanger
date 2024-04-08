@@ -31,7 +31,7 @@ auto_merge_pr=true
 # Get the names of all repos in the org
 # This method is limited to 1k repos, if you have more than 1k repos, use this method: https://medium.com/@kymidd/lets-do-devops-github-api-paginated-calls-more-than-1k-repos-3ff0cc92cc50
 #org_repos=$(gh repo list --no-archived $gh_org -L 1000 --json name --jq '.[].name')
-org_repos=$(cat all_repos)
+org_repos=$(cat targeted_repos)
 
 # Hold until rate-limit success
 hold_until_rate_limit_success() {
@@ -104,7 +104,23 @@ while IFS=$'\n' read -r gh_repo; do
     git checkout -b "$branch_name"
     git commit -m "$commit_message"
     git push origin "$branch_name"
-    created_pr_url=$(gh pr create -b "$pr_body" -t "$pr_title" -B "$base_branch" --fill)
+    
+    # Create while loop to create PR and check output loop
+    # This is necessary because the PR creation may fail due to rate limiting
+    while true; do
+
+      # Create PR
+      created_pr_url=$(gh pr create -b "$pr_body" -t "$pr_title" -B "$base_branch" --fill 2>&1)
+
+      # If the PR creation fails, sleep for 1 minute and try again
+      if [[ "$created_pr_url" == *"pull request create failed"* ]]; then
+        echo "ℹ️  Error creating PR, sleeping for 1 minute and trying again: $created_pr_url"
+        sleep 60
+      else
+        break
+      fi
+    
+    done
 
     # If auto_merge_pr is true, merge the PR
     if [ "$auto_merge_pr" = true ]; then
