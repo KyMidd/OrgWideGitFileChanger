@@ -15,22 +15,23 @@ if [ -z "$GITHUB_TOKEN" ]; then
 fi
 
 # Set vars
-gh_org=your-org-name-here # Your GitHub Organization (or your username, if that's where your repos are)
+gh_org=practicefusion # Your GitHub Organization (or your username, if that's where your repos are)
 
 # PR information - please customize this information
-pr_body="This PR makes some automated changes to the repo."
-pr_title="🤖 Making some changes 🤖"
-branch_name="Branch-Name-Here"
-commit_message="Commit message here"
+pr_body="🤖 DO-6769 Update commitNotify for new jenkins 🤖"
+pr_title="🤖 DO-6769 Update commitNotify for new jenkins 🤖"
+branch_name="feature/DO-6769-Update-commit-notifies-for-new-jenkins"
+commit_message="DO-6769 Update for new jenkins"
 
 # Should we use admin privileges to merge PR. 
 # If true, admin privileges will be used to merge the PR. You must have admin privileges to use this option. 
 # If false, the PR will not be automatically merged. The URL will be written to the log, and you must merge them manually
-auto_merge_pr=false
+auto_merge_pr=true
 
 # Get the names of all repos in the org
 # This method is limited to 1k repos, if you have more than 1k repos, use this method: https://medium.com/@kymidd/lets-do-devops-github-api-paginated-calls-more-than-1k-repos-3ff0cc92cc50
-org_repos=$(gh repo list --no-archived $gh_org -L 1000 --json name --jq '.[].name')
+#org_repos=$(gh repo list --no-archived $gh_org -L 1000 --json name --jq '.[].name')
+org_repos=$(cat test_repos1)
 
 # Iterate over all repos, make changes
 while IFS=$'\n' read -r gh_repo; do
@@ -46,6 +47,7 @@ while IFS=$'\n' read -r gh_repo; do
   ### Add or delete any files you need to this location
   ### For example, modify any file, or copy over existing files
   ###
+  cp /Users/kyler/git/GitHub/KyMidd/OrgWideGitFileChanger/src/MergeCommitNotify.yml .github/workflows/MergeCommitNotify.yml
 
   # Read the REST info on the repo to get the repo's default branch
   # Set that default branch as the base branch for the PR

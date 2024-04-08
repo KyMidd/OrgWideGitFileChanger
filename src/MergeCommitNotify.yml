@@ -1,0 +1,20 @@
+name: Jenkins Commit Notification
+on: 
+  push:
+    branches:
+      - develop
+      - master
+      - main
+
+jobs:
+  jenkins_monitor:
+    runs-on: [self-hosted, Ue1TiEcrRunners]
+    
+    steps:
+      - name: Jenkins Commit Notification
+        id: jenkins_commit_notification
+        uses: practicefusion/ActionJenkinsCommitNotification@v1
+        with:
+          jenkins-username: "${{ secrets.JENKINS_USERNAME }}"
+          jenkins-api-token: "${{ secrets.JENKINS_API_TOKEN }}"
+          jenkins-git-plugin-pat: "${{ secrets.JENKINS_GIT_PLUGIN_PAT }}"
